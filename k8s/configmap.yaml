@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: moodlite-config
+  namespace: moodlite
+data:
+  APP_ENV: "production"
+  FLASK_ENV: "production"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "moodlite"
+  UPLOAD_FOLDER: "/app/uploads"
+  MAX_CONTENT_LENGTH: "52428800"

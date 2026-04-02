@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Create Account{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card fade-in-up" style="max-width:500px;">
+    <div class="auth-logo"><i class="bi bi-person-plus-fill"></i></div>
+    <h2 class="text-center fw-800 mb-1" style="font-size:1.6rem;">Create account</h2>
+    <p class="text-center text-muted mb-4" style="font-size:0.9rem;">Join MoodLite as an instructor or student</p>
+
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <div class="mb-3">
+        <label class="form-label" for="name">Full Name</label>
+        <div class="input-group">
+          <span class="input-group-text" style="background:rgba(255,255,255,0.04);border-color:var(--ml-border);">
+            <i class="bi bi-person text-muted"></i>
+          </span>
+          <input type="text" class="form-control" id="name" name="name" placeholder="Jane Doe" required />
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="email">Email Address</label>
+        <div class="input-group">
+          <span class="input-group-text" style="background:rgba(255,255,255,0.04);border-color:var(--ml-border);">
+            <i class="bi bi-envelope text-muted"></i>
+          </span>
+          <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required />
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Min 6 characters" required minlength="6" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="confirm_password">Confirm Password</label>
+        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Repeat password" required />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">I am joining as</label>
+        <div class="d-flex gap-3">
+          <label class="role-option flex-fill" id="opt-student">
+            <input type="radio" name="role" value="student" class="d-none" id="role-student" checked />
+            <div class="role-card p-3 text-center" id="card-student" style="border-radius:10px;border:2px solid rgba(0,207,180,0.5);background:rgba(0,207,180,0.08);cursor:pointer;transition:all 0.2s;">
+              <div style="font-size:1.5rem;">🎒</div>
+              <div class="fw-600 mt-1" style="font-size:0.9rem;">Student</div>
+            </div>
+          </label>
+          <label class="role-option flex-fill" id="opt-instructor">
+            <input type="radio" name="role" value="instructor" class="d-none" id="role-instructor" />
+            <div class="role-card p-3 text-center" id="card-instructor" style="border-radius:10px;border:2px solid var(--ml-border);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.2s;">
+              <div style="font-size:1.5rem;">👨‍🏫</div>
+              <div class="fw-600 mt-1" style="font-size:0.9rem;">Instructor</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+        <i class="bi bi-rocket-takeoff me-2"></i>Create Account
+      </button>
+    </form>
+
+    <p class="text-center text-muted mt-4 mb-0" style="font-size:0.88rem;">
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}" class="fw-600">Sign in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const studentCard    = document.getElementById('card-student');
+const instructorCard = document.getElementById('card-instructor');
+const roleStudent    = document.getElementById('role-student');
+const roleInstructor = document.getElementById('role-instructor');
+
+function selectRole(role) {
+  if (role === 'student') {
+    studentCard.style.borderColor    = 'rgba(0,207,180,0.6)';
+    studentCard.style.background     = 'rgba(0,207,180,0.12)';
+    instructorCard.style.borderColor = 'var(--ml-border)';
+    instructorCard.style.background  = 'rgba(255,255,255,0.03)';
+    roleStudent.checked = true;
+  } else {
+    instructorCard.style.borderColor = 'rgba(108,99,255,0.6)';
+    instructorCard.style.background  = 'rgba(108,99,255,0.12)';
+    studentCard.style.borderColor    = 'var(--ml-border)';
+    studentCard.style.background     = 'rgba(255,255,255,0.03)';
+    roleInstructor.checked = true;
+  }
+}
+document.getElementById('opt-student').addEventListener('click', () => selectRole('student'));
+document.getElementById('opt-instructor').addEventListener('click', () => selectRole('instructor'));
+</script>
+{% endblock %}

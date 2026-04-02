@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Submissions – {{ assignment.title }}{% endblock %}
+{% block content %}
+<div class="container-fluid px-4">
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1" style="font-size:0.82rem;">
+        <li class="breadcrumb-item"><a href="{{ url_for('courses.dashboard') }}">My Courses</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('courses.view_course', course_id=course.id) }}">{{ course.name }}</a></li>
+        <li class="breadcrumb-item active">Submissions</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <h2><i class="bi bi-people me-2 text-primary"></i>{{ assignment.title }}</h2>
+      <span class="pill">{{ submissions|length }} submission{{ 's' if submissions|length != 1 else '' }}</span>
+    </div>
+    {% if assignment.description %}
+    <p class="text-muted mt-1 mb-0" style="font-size:0.9rem;">{{ assignment.description }}</p>
+    {% endif %}
+  </div>
+
+  {% if submissions %}
+  <div class="ml-card overflow-hidden">
+    <table class="table ml-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>File</th>
+          <th>Submitted</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in submissions %}
+        <tr>
+          <td class="text-muted">{{ loop.index }}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="avatar-pill" style="width:28px;height:28px;font-size:0.72rem;">{{ sub.student.name[0].upper() }}</span>
+              <div>
+                <div class="fw-600" style="font-size:0.88rem;">{{ sub.student.name }}</div>
+                <div class="text-muted" style="font-size:0.75rem;">{{ sub.student.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="pill">
+              <i class="bi bi-file-earmark"></i>
+              <span class="text-truncate" style="max-width:180px;">{{ sub.original_filename }}</span>
+            </span>
+          </td>
+          <td class="text-muted" style="font-size:0.85rem;">{{ sub.submitted_at.strftime('%b %d, %Y %H:%M') }}</td>
+          <td class="text-end">
+            <a href="{{ url_for('assignments.download_submission', submission_id=sub.id) }}"
+               class="btn btn-sm btn-outline-primary py-1 px-3">
+              <i class="bi bi-download me-1"></i>Download
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state mt-5">
+    <i class="bi bi-inbox"></i>
+    <h5 class="text-muted">No submissions yet</h5>
+    <p>Students haven't submitted anything for this assignment.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

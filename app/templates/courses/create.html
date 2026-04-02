@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Create Course{% endblock %}
+{% block content %}
+<div class="container" style="max-width:640px;">
+  <div class="page-header">
+    <h2><i class="bi bi-plus-circle me-2 text-primary"></i>Create New Course</h2>
+  </div>
+  <div class="ml-card p-4">
+    <form method="POST" action="{{ url_for('courses.create') }}">
+      <div class="mb-4">
+        <label class="form-label" for="name">Course Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Introduction to DevOps" required />
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="description">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4"
+          placeholder="Describe what students will learn in this course..."></textarea>
+      </div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color:var(--ml-border) !important;">
+        <a href="{{ url_for('courses.dashboard') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-check-lg me-2"></i>Create Course
+        </button>
+      </div>
+    </form>
+  </div>
+  <p class="text-muted small mt-3">
+    <i class="bi bi-info-circle me-1"></i>
+    A unique enroll code will be generated automatically. Share it with your students.
+  </p>
+</div>
+{% endblock %}

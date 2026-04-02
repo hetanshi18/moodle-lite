@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}{{ course.name }}{% endblock %}
+{% block content %}
+<div class="container-fluid px-4">
+  <!-- Page Header -->
+  <div class="page-header d-flex align-items-start justify-content-between flex-wrap gap-3">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1" style="font-size:0.82rem;">
+          <li class="breadcrumb-item"><a href="{{ url_for('courses.dashboard') }}">My Courses</a></li>
+          <li class="breadcrumb-item active text-muted">{{ course.name }}</li>
+        </ol>
+      </nav>
+      <h2>{{ course.name }}</h2>
+      {% if course.description %}
+      <p class="text-muted mb-0 mt-1" style="font-size:0.9rem;max-width:600px;">{{ course.description }}</p>
+      {% endif %}
+    </div>
+    {% if is_instructor %}
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      <div class="text-center px-3 py-2" style="background:rgba(0,207,180,0.1);border:1px solid rgba(0,207,180,0.25);border-radius:10px;">
+        <div class="enroll-code-badge">{{ course.enroll_code }}</div>
+        <div class="text-muted mt-1" style="font-size:0.72rem;">ENROLL CODE</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <a href="{{ url_for('content.upload', course_id=course.id) }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-cloud-upload me-1"></i>Upload Content
+        </a>
+        <a href="{{ url_for('assignments.create', course_id=course.id) }}" class="btn btn-secondary-ml btn-sm">
+          <i class="bi bi-plus-circle me-1"></i>New Assignment
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Stats Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-4 col-md-3">
+      <div class="stat-tile">
+        <div class="stat-value">{{ enrollments_count }}</div>
+        <div class="stat-label"><i class="bi bi-people me-1"></i>Students</div>
+      </div>
+    </div>
+    <div class="col-4 col-md-3">
+      <div class="stat-tile">
+        <div class="stat-value">{{ content_items|length }}</div>
+        <div class="stat-label"><i class="bi bi-file-earmark me-1"></i>Files</div>
+      </div>
+    </div>
+    <div class="col-4 col-md-3">
+      <div class="stat-tile">
+        <div class="stat-value">{{ assignments|length }}</div>
+        <div class="stat-label"><i class="bi bi-pencil-square me-1"></i>Assignments</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Content Section -->
+    <div class="col-lg-7">
+      <div class="section-title"><i class="bi bi-folder2-open"></i>Course Content</div>
+      {% if content_items %}
+        {% for item in content_items %}
+        {% set ext = item.original_filename.rsplit('.',1)[-1].lower() if '.' in item.original_filename else 'file' %}
+        <div class="file-item">
+          <span class="file-icon">
+            {% if ext in ['pdf'] %}<i class="bi bi-file-earmark-pdf text-danger"></i>
+            {% elif ext in ['mp4','mkv','avi','mov'] %}<i class="bi bi-play-circle-fill" style="color:#a29bfe;"></i>
+            {% elif ext in ['jpg','jpeg','png','gif'] %}<i class="bi bi-image" style="color:#fd79a8;"></i>
+            {% elif ext in ['docx','doc'] %}<i class="bi bi-file-earmark-word" style="color:#74b9ff;"></i>
+            {% elif ext in ['zip','rar','tar','gz'] %}<i class="bi bi-file-earmark-zip" style="color:#fdcb6e;"></i>
+            {% else %}<i class="bi bi-file-earmark-text"></i>{% endif %}
+          </span>
+          <div class="flex-grow-1 min-width-0">
+            <div class="fw-600 text-truncate" style="font-size:0.9rem;">{{ item.title }}</div>
+            <div class="text-muted" style="font-size:0.75rem;">{{ item.original_filename }} &mdash; {{ item.uploaded_at.strftime('%b %d, %Y') }}</div>
+          </div>
+          <div class="d-flex gap-2 flex-shrink-0">
+            <a href="{{ url_for('content.download', content_id=item.id) }}" class="btn btn-sm btn-outline-primary py-1 px-2" title="Download">
+              <i class="bi bi-download"></i>
+            </a>
+            {% if is_instructor %}
+            <form method="POST" action="{{ url_for('content.delete', content_id=item.id) }}" onsubmit="return confirm('Delete this file?')">
+              <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-folder-x"></i>
+        <p>No content uploaded yet.</p>
+        {% if is_instructor %}
+        <a href="{{ url_for('content.upload', course_id=course.id) }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-cloud-upload me-1"></i>Upload first file
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Assignments Section -->
+    <div class="col-lg-5">
+      <div class="section-title"><i class="bi bi-pencil-square"></i>Assignments</div>
+      {% if assignments %}
+        {% for a in assignments %}
+        <div class="assignment-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-600" style="font-size:0.95rem;">{{ a.title }}</div>
+              {% if a.description %}
+              <div class="text-muted small mt-1" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ a.description }}</div>
+              {% endif %}
+              {% if a.due_date %}
+              <div class="mt-2">
+                <span class="pill {% if a.due_date < now %}pill-danger{% else %}pill-green{% endif %}">
+                  <i class="bi bi-calendar-event"></i>
+                  Due {{ a.due_date.strftime('%b %d, %Y %H:%M') }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            {% if is_instructor %}
+            <a href="{{ url_for('assignments.view_submissions', assignment_id=a.id) }}"
+               class="btn btn-sm btn-secondary-ml">
+              <i class="bi bi-people me-1"></i>Submissions
+            </a>
+            {% else %}
+            <a href="{{ url_for('assignments.submit', assignment_id=a.id) }}"
+               class="btn btn-sm btn-primary">
+              <i class="bi bi-upload me-1"></i>Submit
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-journal-x"></i>
+        <p>No assignments yet.</p>
+        {% if is_instructor %}
+        <a href="{{ url_for('assignments.create', course_id=course.id) }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus-circle me-1"></i>Create Assignment
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Inject `now` for due-date comparison in template would need context processor
+// so pill-danger class is toggled statically here if past due
+const now = new Date();
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+## Prometheus + Grafana — Helm Values Override
+## Chart: prometheus-community/kube-prometheus-stack
+## Install command:
+##   helm install monitoring prometheus-community/kube-prometheus-stack \
+##     -n monitoring --create-namespace -f monitoring/values.yaml
+
+prometheus:
+  prometheusSpec:
+    scrapeInterval: 15s
+    evaluationInterval: 15s
+    retention: 7d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 400Mi
+      limits:
+        cpu: 500m
+        memory: 800Mi
+    additionalScrapeConfigs:
+      - job_name: moodlite-app
+        static_configs:
+          - targets:
+              - moodlite-service.moodlite.svc.cluster.local:80
+
+grafana:
+  enabled: true
+  adminUser: admin
+  adminPassword: moodlite-grafana        # Change before real deployment
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: default
+          orgId: 1
+          folder: MoodLite
+          type: file
+          disableDeletion: false
+          options:
+            path: /var/lib/grafana/dashboards/default
+
+alertmanager:
+  enabled: false                         # Disabled – not needed for demo
+
+kubeStateMetrics:
+  enabled: true                          # Provides pod CPU and memory metrics
+
+nodeExporter:
+  enabled: true
+
+defaultRules:
+  create: true
+  rules:
+    alertmanager: false
+    etcd: false
+    configReloaders: true
+    general: true
+    kubeApiserverAvailability: false
+    kubeApiserverBurnrate: false
+    kubeApiserverHistogram: false
+    kubeApiserverSlos: false
+    kubeControllerManager: false
+    kubelet: true
+    kubeProxy: false
+    kubeScheduler: false
+    kubeStateMetrics: true
+    network: true
+    node: true
+    nodeExporterAlerting: false
+    nodeExporterRecording: true
+    prometheus: true
+    prometheusOperator: true

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: moodlite-pv
+  labels:
+    app: moodlite
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/moodlite-data        # Path on the Minikube node
+  persistentVolumeReclaimPolicy: Retain

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Enroll in Course{% endblock %}
+{% block content %}
+<div class="container" style="max-width:500px;">
+  <div class="page-header">
+    <h2><i class="bi bi-person-plus me-2 text-primary"></i>Enroll in a Course</h2>
+  </div>
+  <div class="ml-card p-4">
+    <p class="text-muted mb-4" style="font-size:0.9rem;">
+      Ask your instructor for the enroll code and enter it below.
+    </p>
+    <form method="POST" action="{{ url_for('courses.enroll') }}">
+      <div class="mb-4">
+        <label class="form-label" for="enroll_code">Enroll Code <span class="text-danger">*</span></label>
+        <input type="text" class="form-control text-center fw-700"
+          id="enroll_code" name="enroll_code"
+          placeholder="e.g. X7KQ2A"
+          style="font-size:1.4rem;letter-spacing:4px;font-family:'Courier New',monospace;"
+          maxlength="20" required autocomplete="off" />
+      </div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color:var(--ml-border) !important;">
+        <a href="{{ url_for('courses.dashboard') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-check-lg me-2"></i>Enroll
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Auto-uppercase the enroll code input
+document.getElementById('enroll_code').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
+</script>
+{% endblock %}

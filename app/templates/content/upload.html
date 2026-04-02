@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Upload Content{% endblock %}
+{% block content %}
+<div class="container" style="max-width:640px;">
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1" style="font-size:0.82rem;">
+        <li class="breadcrumb-item"><a href="{{ url_for('courses.dashboard') }}">My Courses</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('courses.view_course', course_id=course.id) }}">{{ course.name }}</a></li>
+        <li class="breadcrumb-item active">Upload Content</li>
+      </ol>
+    </nav>
+    <h2><i class="bi bi-cloud-upload me-2 text-primary"></i>Upload Content</h2>
+  </div>
+
+  <div class="ml-card p-4">
+    <form method="POST" action="{{ url_for('content.upload', course_id=course.id) }}" enctype="multipart/form-data">
+      <div class="mb-4">
+        <label class="form-label" for="title">Content Title <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="title" name="title"
+          placeholder="e.g. Lecture 1 – Introduction to Docker" required />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">File <span class="text-danger">*</span></label>
+        <label for="file" class="upload-zone d-block">
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+          <div class="fw-600 mb-1">Click to browse or drag & drop</div>
+          <div class="text-muted small upload-filename">PDF, DOCX, PNG, MP4, ZIP — max 50 MB</div>
+          <input type="file" id="file" name="file" class="d-none" required
+            accept=".pdf,.png,.jpg,.jpeg,.gif,.docx,.txt,.mp4,.zip" />
+        </label>
+      </div>
+
+      <div class="d-flex justify-content-between pt-2 border-top" style="border-color:var(--ml-border) !important;">
+        <a href="{{ url_for('courses.view_course', course_id=course.id) }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-upload me-2"></i>Upload
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

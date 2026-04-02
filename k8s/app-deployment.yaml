@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moodlite-app
+  namespace: moodlite
+  labels:
+    app: moodlite-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moodlite-app
+  template:
+    metadata:
+      labels:
+        app: moodlite-app
+    spec:
+      containers:
+        - name: moodlite
+          image: yourdockerhubusername/moodlite:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: moodlite-config
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: moodlite-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: moodlite-secret
+                  key: DB_PASSWORD
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: moodlite-secret
+                  key: SECRET_KEY
+          volumeMounts:
+            - name: uploads-storage
+              mountPath: /app/uploads
+              subPath: uploads
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2
+      volumes:
+        - name: uploads-storage
+          persistentVolumeClaim:
+            claimName: moodlite-pvc
