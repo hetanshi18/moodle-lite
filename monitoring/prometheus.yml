@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'moodlite-monitor'
+    environment: 'production'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+rule_files:
+  - 'alert-rules.yml'
+
+scrape_configs:
+  # Local node metrics
+  - job_name: 'node'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          instance: 'local-machine'
+
+  # MoodLite application health
+  - job_name: 'moodlite-health'
+    scrape_interval: 30s
+    metrics_path: '/health'
+    static_configs:
+      - targets: ['localhost:5000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'moodlite-local'
+
+  # MoodLite application metrics (if deployed locally)
+  - job_name: 'moodlite-metrics'
+    scrape_interval: 15s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['localhost:8000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'moodlite-app'
+
+  # AWS EC2 instance (via SSH tunnel - configure after EC2 deployed)
+  # - job_name: 'aws-ec2'
+  #   static_configs:
+  #     - targets: ['localhost:9100']
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: instance
+  #       replacement: 'aws-ec2'
