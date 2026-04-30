@@ -6,6 +6,11 @@ from flask_login import login_required, current_user
 from app import db
 from app.models import Assignment, Course, Enrollment, Submission
 
+
+def allowed_file(filename):
+    allowed = current_app.config.get("ALLOWED_EXTENSIONS", set())
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
+
 assignments_bp = Blueprint("assignments", __name__, template_folder="../templates/assignments")
 
 
@@ -57,6 +62,9 @@ def submit(assignment_id):
         file = request.files.get("file")
         if not file or file.filename == "":
             flash("A file is required.", "danger")
+            return redirect(url_for("assignments.submit", assignment_id=assignment_id))
+        if not allowed_file(file.filename):
+            flash("File type not allowed.", "danger")
             return redirect(url_for("assignments.submit", assignment_id=assignment_id))
         original_name = file.filename
         ext = original_name.rsplit(".", 1)[1].lower() if "." in original_name else "bin"

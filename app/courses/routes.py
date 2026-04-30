@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from app import db
@@ -87,4 +88,5 @@ def view_course(course_id):
         content_items=content_items,
         assignments=assignments,
         enrollments_count=enrollments_count,
+        now=datetime.utcnow(),
     )
