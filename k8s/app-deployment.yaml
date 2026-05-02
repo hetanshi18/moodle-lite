@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: moodlite
-          image: yourdockerhubusername/moodlite:latest
+          image: arsalan9702/moodlite:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
